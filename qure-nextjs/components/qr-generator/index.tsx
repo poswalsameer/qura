@@ -40,7 +40,7 @@ const defaultOptions: Options = {
     type: "rounded" as DotType,
   },
   backgroundOptions: {
-    color: "#ffffff",
+    color: "transparent",
   },
   cornersSquareOptions: {
     color: "#2b2d42",
@@ -76,10 +76,6 @@ export default function QRGenerator() {
 
     canvas.width = textWidth + padding * 2
     canvas.height = fontSize + padding * 2
-
-    // White background for text readability
-    ctx.fillStyle = "#ffffff"
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     ctx.fillStyle = color
     ctx.font = `bold ${fontSize}px sans-serif`
@@ -147,27 +143,27 @@ export default function QRGenerator() {
 
   return (
     <div className="w-full max-w-5xl mx-auto">
-      <Card className="flex flex-col gap-x-0 p-0 font-sans lg:flex-row shadow-none border-2 border-[#2b2d42] rounded-2xl">
+      <Card className="flex flex-col gap-x-0 p-0 font-sans lg:flex-row shadow-none border-2 border-[#dda15e] rounded-2xl overflow-hidden">
 
         {/* Left Column: Controls */}
-        <div className="w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r-2 border-[#2b2d42] bg-transparent flex flex-col justify-between">
+        <div className="w-full bg-[#fefae0]/30 lg:w-1/2 border-b lg:border-b-0 lg:border-r-2 border-[#dda15e] flex flex-col justify-between">
 
           {/* Scrollable Content Area */}
-          <div className="p-4 flex flex-col gap-y-8 flex-1 overflow-y-auto">
+          <div className="p-4 flex flex-col gap-y-8 flex-1 overflow-y-auto justify-center">
             <div className="w-full flex flex-col justify-center items-center">
-              <CardTitle className="text-2xl font-medium text-[#2b2d42]">
+              <CardTitle className="text-2xl font-medium text-[#283618]">
                 QR Configuration
               </CardTitle>
-              <CardDescription className="text-lg font-medium text-[#8d99ae]">
+              <CardDescription className="text-lg font-medium text-[#606c38]">
                 Customize your QR code details below
               </CardDescription>
             </div>
 
-            <div className="flex flex-col gap-y-6">
+            <div className="flex flex-col gap-y-0">
 
               {/* Brand Name Group */}
               <div className="flex flex-row items-center w-full group">
-                <div className="h-12 px-4 bg-[#ebf2fa] border border-r-0 border-[#8d99ae]/30 rounded-l-lg flex items-center justify-center min-w-[80px] text-sm font-semibold text-[#2b2d42] whitespace-nowrap">
+                <div className="h-12 px-4 bg-transparent border-2 border-r-0 border-[#dda15e] rounded-tl-lg flex items-center justify-center min-w-[80px] text-sm font-semibold text-[#283618] whitespace-nowrap">
                   Name
                 </div>
                 <Input
@@ -175,13 +171,13 @@ export default function QRGenerator() {
                   placeholder="My Awesome Brand"
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
-                  className="h-12 bg-white border-[#8d99ae]/30 rounded-l-none rounded-r-lg border-l-0 focus-visible:ring-0 focus-visible:border-[#2b2d42] transition-all"
+                  className="h-12 bg-transparent border-2 border-[#dda15e] rounded-tr-lg rounded-l-none rounded-br-none border-l-0 focus-visible:ring-0 focus-visible:border-[#dda15e] transition-all"
                 />
               </div>
 
               {/* URL Group */}
               <div className="flex flex-row items-center w-full group">
-                <div className="h-12 px-4 bg-[#ebf2fa] border border-r-0 border-[#8d99ae]/30 rounded-l-lg flex items-center justify-center min-w-[80px] text-sm font-semibold text-[#2b2d42] whitespace-nowrap">
+                <div className="h-12 px-4 bg-transparent border-2 border-t-0 border-r-0 border-[#dda15e] flex items-center justify-center min-w-[80px] text-sm font-semibold text-[#283618] whitespace-nowrap">
                   URL
                 </div>
                 <Input
@@ -189,13 +185,13 @@ export default function QRGenerator() {
                   placeholder="https://example.com"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="h-12 bg-white border-[#8d99ae]/30 rounded-l-none rounded-r-lg border-l-0 focus-visible:ring-0 focus-visible:border-[#2b2d42] transition-all"
+                  className="h-12 bg-transparent border-2 border-t-0 border-[#dda15e] rounded-none border-l-0 focus-visible:ring-0 focus-visible:border-[#dda15e] transition-all"
                 />
               </div>
 
               {/* Color Group */}
               <div className="flex flex-row items-center w-full group">
-                <div className="h-12 px-4 bg-[#ebf2fa] border border-r-0 border-[#8d99ae]/30 rounded-l-lg flex items-center justify-center min-w-[80px] text-sm font-semibold text-[#2b2d42] whitespace-nowrap">
+                <div className="h-12 px-4 bg-transparent border-2 border-t-0 border-r-0 border-[#dda15e] rounded-bl-lg flex items-center justify-center min-w-[80px] text-sm font-semibold text-[#283618] whitespace-nowrap">
                   Color
                 </div>
                 <div className="relative flex-1 h-12 flex items-center">
@@ -212,7 +208,7 @@ export default function QRGenerator() {
                   <Input
                     value={color}
                     onChange={handleColorChange}
-                    className="h-12 pl-20 bg-white border-[#8d99ae]/30 rounded-l-none rounded-r-lg border-l-0 focus-visible:ring-0 focus-visible:border-[#2b2d42] font-mono uppercase transition-all w-full"
+                    className="h-12 pl-20 bg-transparent border-2 border-t-0 border-[#dda15e] rounded-br-lg rounded-tr-none rounded-l-none border-l-0 focus-visible:ring-0 focus-visible:border-[#dda15e] font-mono uppercase transition-all w-full"
                     maxLength={7}
                   />
                 </div>
@@ -224,7 +220,7 @@ export default function QRGenerator() {
           {/* Generate Button - Fixed at bottom */}
           <Button
             onClick={handleGenerate}
-            className="w-full rounded-none lg:rounded-bl-2xl bg-[#2b2d42] hover:bg-[#2b2d42]/90 text-[#ebf2fa] font-semibold h-16 text-lg transition-all duration-300 shadow-none border-t-0"
+            className="w-full rounded-none lg:rounded-bl-2xl bg-[#fefae0] hover:bg-transparent cursor-pointer text-[#283618] font-semibold h-16 text-lg transition-all duration-300 shadow-none border-t-2 border-t-[#dda15e]"
           >
             <QrCode className="h-10 w-10" />
             GENERATE
@@ -232,7 +228,7 @@ export default function QRGenerator() {
         </div>
 
         {/* Right Column: Preview & Download */}
-        <div className="w-full lg:w-1/2 flex flex-col bg-transparent">
+        <div className="w-full lg:w-1/2 flex flex-col bg-[#fefae0]/30">
 
           {/* Preview Area - Takes remaining space */}
           <div className="flex-1 flex flex-col items-center justify-center p-8 min-h-[300px]">
@@ -241,14 +237,14 @@ export default function QRGenerator() {
                 {!isGenerated ? (
                   <div className="flex flex-col items-center justify-center text-center space-y-6 animate-in fade-in zoom-in duration-500">
                     <div className="w-20 h-20 rounded-2xl flex items-center justify-center animate-pulse">
-                      <QrCode className="w-8 h-8 text-[#8d99ae]" />
+                      <QrCode className="w-20 h-20 text-[#283618]" />
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-lg font-semibold text-[#2b2d42]">
+                    <div className="space-y-1">
+                      <p className="text-2xl font-medium text-[#2b2d42]">
                         Preview Area
                       </p>
-                      <p className="text-xs text-[#8d99ae] max-w-xs">
-                        Enter details to generate.
+                      <p className="text-lg text-[#606c38] max-w-xs">
+                        Enter details to generate
                       </p>
                     </div>
                   </div>
@@ -260,11 +256,11 @@ export default function QRGenerator() {
           </div>
 
           {/* Download Buttons - Fixed at bottom */}
-          <div className={`grid grid-cols-3 w-full h-16 transition-all duration-500 ${isGenerated ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+          <div className={`grid grid-cols-3 w-full h-16 transition-all duration-500 `}>
             <Button
               onClick={() => handleDownload("png")}
               disabled={!isGenerated}
-              className="w-full h-full rounded-none rounded-bl-2xl lg:rounded-bl-none border-r border-[#ebf2fa]/20 bg-[#2b2d42] hover:bg-[#2b2d42]/90 text-[#ebf2fa] font-medium shadow-none"
+              className="w-full h-full rounded-none rounded-bl-2xl lg:rounded-bl-none border-t-2 border-r-2 border-[#dda15e] bg-[#fefae0] hover:bg-transparent cursor-pointer text-[#283618] font-medium shadow-none"
             >
               <Download className="mr-2 h-4 w-4" />
               PNG
@@ -272,7 +268,7 @@ export default function QRGenerator() {
             <Button
               onClick={() => handleDownload("jpeg")}
               disabled={!isGenerated}
-              className="w-full h-full rounded-none border-r border-[#ebf2fa]/20 bg-[#2b2d42] hover:bg-[#2b2d42]/90 text-[#ebf2fa] font-medium shadow-none"
+              className="w-full h-full rounded-none border-t-2 border-r-2 border-[#dda15e] bg-[#fefae0] hover:bg-transparent cursor-pointer text-[#283618] font-medium shadow-none"
             >
               <Download className="mr-2 h-4 w-4" />
               JPG
@@ -280,7 +276,7 @@ export default function QRGenerator() {
             <Button
               onClick={() => handleDownload("svg")}
               disabled={!isGenerated}
-              className="w-full h-full rounded-none rounded-br-2xl bg-[#2b2d42] hover:bg-[#2b2d42]/90 text-[#ebf2fa] font-medium shadow-none"
+              className="w-full h-full rounded-none rounded-br-2xl border-t-2 border-[#dda15e] border-l-0 bg-[#fefae0] hover:bg-transparent cursor-pointer text-[#283618] font-medium shadow-none"
             >
               <Download className="mr-2 h-4 w-4" />
               SVG
