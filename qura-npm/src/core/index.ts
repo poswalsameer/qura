@@ -1,6 +1,6 @@
 import sharp from 'sharp'
 import { CreateQuraCodeOptions, QuraCodeResult } from '../types'
-import { generateSvgString } from '../core/generator'
+import { generateSvgString } from './generator'
 
 /**
  * Creates a QuraCode based on exactly defined parameters avoiding DOM constraints

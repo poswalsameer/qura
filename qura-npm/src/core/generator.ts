@@ -1,18 +1,11 @@
-import QRCode from 'qrcode'
 import { CreateQuraCodeOptions } from '../types'
-import { QuraCodeError } from '../errors'
-
-export function getQrMatrix(data: string) {
-  try {
-    const qr = QRCode.create(data, { errorCorrectionLevel: 'H' })
-    return {
-      size: qr.modules.size,
-      data: qr.modules.data
-    }
-  } catch (error: any) {
-    throw new QuraCodeError(`Failed to generate QR Matrix: ${error.message}`, 'QURA_ERR_MATRIX')
-  }
-}
+import {
+  drawFinder,
+  getQrMatrix,
+  isCenterCutout,
+  isDark,
+  isFinderPattern
+} from '../utils'
 
 export function generateSvgString(options: Required<CreateQuraCodeOptions>): string {
   const { url, name, color } = options
@@ -23,57 +16,35 @@ export function generateSvgString(options: Required<CreateQuraCodeOptions>): str
   // Quiet zone of 4 modules as per QR specs
   const moduleSize = imageSize / (size + 8)
   const quietZoneShift = 4
-
-  const isDark = (row: number, col: number) => {
-    if (row < 0 || row >= size || col < 0 || col >= size) return false
-    return data[row * size + col] === 1
-  }
-
-  const isFinderPattern = (row: number, col: number) => {
-    return (row < 7 && col < 7) ||
-      (row < 7 && col >= size - 7) ||
-      (row >= size - 7 && col < 7)
-  }
-
-  const isCenterCutout = (row: number, col: number) => {
-    // Cutout a 7x7 hole in the middle if there is a text name
-    if (!name) return false
-    const centerStart = Math.floor(size / 2) - 4
-    const centerEnd = Math.floor(size / 2) + 3
-    return (row >= centerStart && row <= centerEnd) && (col >= centerStart && col <= centerEnd)
-  }
-
   let paths = ''
 
-  // Background
   paths += `<rect width="100%" height="100%" fill="${backgroundColor}" />\n`
 
-  // Finder Patterns (drawn with extra rounded corners similar to qr-code-styling)
-  const drawFinder = (xPos: number, yPos: number) => {
-    const x = (xPos + quietZoneShift) * moduleSize
-    const y = (yPos + quietZoneShift) * moduleSize
-
-    const outrLength = 7 * moduleSize
-    const innrLength = 3 * moduleSize
-
-    const strokeWidth = moduleSize
-    const outrRadius = outrLength * 0.25
-    const innrRadius = innrLength * 0.5
-
-    // Outer frame
-    paths += `  <rect x="${x + strokeWidth / 2}" y="${y + strokeWidth / 2}" width="${outrLength - strokeWidth}" height="${outrLength - strokeWidth}" rx="${outrRadius}" fill="transparent" stroke="${color}" stroke-width="${strokeWidth}" />\n`
-    // Inner dot
-    paths += `  <rect x="${x + 2 * moduleSize}" y="${y + 2 * moduleSize}" width="${innrLength}" height="${innrLength}" rx="${innrRadius}" fill="${color}" />\n`
-  }
-
-  drawFinder(0, 0)               // Top-Left
-  drawFinder(size - 7, 0)        // Top-Right
-  drawFinder(0, size - 7)        // Bottom-Left
+  drawFinder({ xPos: 0, yPos: 0, quietZoneShift, moduleSize, paths, color })
+  drawFinder({ xPos: size - 7, yPos: 0, quietZoneShift, moduleSize, paths, color })
+  drawFinder({ xPos: 0, yPos: size - 7, quietZoneShift, moduleSize, paths, color })
 
   // Main QR dots (rounded circles)
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
-      if (!isDark(r, c) || isFinderPattern(r, c) || isCenterCutout(r, c)) continue
+      if (
+        !isDark({
+          row: r,
+          col: c,
+          size, data
+        }) ||
+        isFinderPattern({
+          row: r,
+          col: c,
+          size
+        }) ||
+        isCenterCutout({
+          row: r,
+          col: c,
+          size,
+          name
+        })
+      ) continue
 
       const x = (c + quietZoneShift) * moduleSize
       const y = (r + quietZoneShift) * moduleSize
