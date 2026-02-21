@@ -15,8 +15,10 @@ export function getQrMatrix(data: string) {
 }
 
 export function generateSvgString(options: Required<CreateQuraCodeOptions>): string {
-  const { url, name, color, backgroundColor, size: imageSize, logo } = options
+  const { url, name, color } = options
   const { size, data } = getQrMatrix(url)
+  const imageSize = 1024
+  const backgroundColor = '#ffffff'
 
   // Quiet zone of 4 modules as per QR specs
   const moduleSize = imageSize / (size + 8)
@@ -34,8 +36,8 @@ export function generateSvgString(options: Required<CreateQuraCodeOptions>): str
   }
 
   const isCenterCutout = (row: number, col: number) => {
-    // Cutout a 7x7 hole in the middle if there is a logo or text name
-    if (!name && !logo) return false
+    // Cutout a 7x7 hole in the middle if there is a text name
+    if (!name) return false
     const centerStart = Math.floor(size / 2) - 4
     const centerEnd = Math.floor(size / 2) + 3
     return (row >= centerStart && row <= centerEnd) && (col >= centerStart && col <= centerEnd)
@@ -83,22 +85,14 @@ export function generateSvgString(options: Required<CreateQuraCodeOptions>): str
     }
   }
 
-  // Draw Center Logo / Brand Name
-  if (logo || name) {
+  // Draw Center Brand Name
+  if (name) {
     const spaceSize = 8 * moduleSize
     const cx = (size + 8) * moduleSize / 2
     const cy = (size + 8) * moduleSize / 2
 
-    if (logo) {
-      // Typically the logo URL should be a dataURI base64 string for SVG embedding to work natively anywhere.
-      // But we just emit the SVG <image> tag.
-      const lx = cx - spaceSize / 2
-      const ly = cy - spaceSize / 2
-      paths += `  <image href="${logo}" x="${lx}" y="${ly}" width="${spaceSize}" height="${spaceSize}" preserveAspectRatio="xMidYMid slice" />\n`
-    } else if (name) {
-      const fontSize = spaceSize * 0.35
-      paths += `  <text x="${cx}" y="${cy}" font-family="sans-serif" font-weight="bold" font-size="${fontSize}px" fill="${color}" text-anchor="middle" dominant-baseline="central">${name.slice(0, 20)}</text>\n`
-    }
+    const fontSize = spaceSize * 0.35
+    paths += `  <text x="${cx}" y="${cy}" font-family="sans-serif" font-weight="bold" font-size="${fontSize}px" fill="${color}" text-anchor="middle" dominant-baseline="central">${name.slice(0, 20)}</text>\n`
   }
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${imageSize} ${imageSize}" width="${imageSize}" height="${imageSize}">\n${paths}</svg>`

@@ -7,8 +7,8 @@ A clean, minimal-dependency programmatic API for generating stunning, branded, a
 - **No DOM Dependencies**: Safe to rely on in Node.js backend functions, Cloudflare Workers, Next.js App Router API, and AWS Lambda.
 - **Tree-Shakable**: Built correctly as ESM, maintaining backwards compatibility with CommonJS via `main` and `exports`.
 - **Elegant Architecture**: Uses clean separation of generating matrix data vs rasterizing images with Sharp.
-- **Customization**: Offers options to customize colors, roundness style, insert logos, and text brand names natively.
-- **Battle Tested**: Leverages `qrcode` purely for error-correction generation arrays without using its old DOM-dependent renderers, and constructs high-performance SVGs manually converted via `sharp` for stunning rasterized output.
+- **Customization**: Strictly focused interface requiring only mandatory `name`, `url` and `color` fields for a streamlined experience.
+- **Battle Tested**: Leverages `qrcode` purely for error-correction generation arrays without using its old DOM-dependent renderers, and constructs high-performance SVGs manually converted via `sharp` for stunning rasterized output in PNG format.
 
 ## Installation
 
@@ -31,41 +31,21 @@ async function main() {
     url: "https://example.com",
   })
 
-  // Example 1: Save buffer to file
-  fs.writeFileSync("qr.png", qr.buffer)
+  // Ensure generation succeeded
+  if (!qr.success) {
+    console.error("Failed to generate QR Code")
+    return
+  }
+
+  // Example 1: Save Base64 to physical PNG file
+  const fileBuffer = Buffer.from(qr.base64, "base64")
+  fs.writeFileSync("qr.png", fileBuffer)
 
   // Example 2: Use Base64 directly in Email HTML or React image tag
-  console.log(`Use this URL directly: ${qr.dataUrl}`)
+  console.log(`Use this URL directly: data:image/png;base64,${qr.base64}`)
 }
 
 main()
-```
-
-### Advanced Examples
-
-Generate SVG explicitly:
-
-```ts
-const svgQr = await createQuraCode({
-  name: "My App",
-  color: "#ff0000",
-  url: "https://example.com",
-  format: "svg", // pure string xml under the hood
-  backgroundColor: "#000",
-})
-
-console.log(svgQr.buffer.toString("utf-8")) // Prints pure SVG xml
-```
-
-Use a Custom Logo URL:
-_Note: when using `format: 'svg'`, it is standard convention to provide your logo as a Base64 URI so it can be viewed organically in any browser without causing CORS or load breaks._
-
-```ts
-const custom = await createQuraCode({
-  color: "#1A73E8",
-  url: "https://example.com",
-  logo: "data:image/png;base64,...", // Optional Logo
-})
 ```
 
 ### AWS / HTTP Response Example
@@ -82,9 +62,15 @@ export async function GET(req, res) {
     url: "https://myticket.com",
   })
 
-  return new Response(qr.buffer, {
+  if (!qr.success) {
+    return new Response("QR Generation Failed", { status: 500 })
+  }
+
+  const outputBuffer = Buffer.from(qr.base64, "base64")
+
+  return new Response(outputBuffer, {
     headers: {
-      "Content-Type": qr.mimeType,
+      "Content-Type": "image/png",
       "Content-Disposition": 'inline; filename="qr.png"',
     },
   })
@@ -106,12 +92,14 @@ async function uploadQrCode() {
     url: "https://example.com/promo",
   })
 
+  if (!qr.success) return
+
   await s3.send(
     new PutObjectCommand({
       Bucket: "my-qr-bucket",
       Key: "campaign.png",
-      Body: qr.buffer,
-      ContentType: qr.mimeType,
+      Body: Buffer.from(qr.base64, "base64"),
+      ContentType: "image/png",
     }),
   )
 }
@@ -121,19 +109,13 @@ async function uploadQrCode() {
 
 ### `createQuraCode(options: CreateQuraCodeOptions): Promise<QuraCodeResult>`
 
-**CreateQuraCodeOptions:**
+**CreateQuraCodeOptions (All Fields are Mandatory):**
 
 - `name` (string): Brand or name printed in the center text cutout.
 - `url` (string): The data or URL encoded into the image format.
 - `color` (string): The primary foreground hexadecimal color code (e.g. `"#1A73A8"`).
-- `backgroundColor?` (string): Background hexadecimal color (default: `#ffffff`).
-- `logo?` (string): External image payload to embed in the center. Overrides `name`.
-- `format?` (`"png" | "svg"`): Output format required.
-- `size?` (number): The image boundary height and width (default: 1024 pixels).
 
 **QuraCodeResult:**
 
-- `buffer` (Buffer): The primitive image binary suitable for disk writing.
-- `base64` (string): Just the raw Base64 string component.
-- `dataUrl` (string): A fully formed Base64 String URL `data:{mimeType};base64,...`.
-- `mimeType` (string): Document MIME type mapped to chosen format (`image/png` or `image/svg+xml`).
+- `success` (boolean): Flags whether generation succeeded (`true`) or failed (`false` due to invalid parameters or renderer exceptions).
+- `base64` (string): The resulting binary PNG image encoded strictly as a raw Base64 string payload.
