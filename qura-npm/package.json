@@ -1,0 +1,47 @@
+{
+  "name": "qura-code",
+  "version": "1.0.0",
+  "description": "Generate beautiful, branded, custom-colored QR codes seamlessly in Node.js.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "qr",
+    "qrcode",
+    "generator",
+    "qura",
+    "branded",
+    "svg",
+    "png"
+  ],
+  "author": "Poswal Sameer",
+  "license": "MIT",
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/qrcode": "^1.5.5",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
